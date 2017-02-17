@@ -2,7 +2,6 @@ import unittest
 import tweepy
 import requests
 import json
-from twitter_info import consumer_key, consumer_secret, access_token, access_token_secret
 
 ## SI 206 - W17 - HW5
 ## COMMENT WITH:
@@ -36,7 +35,10 @@ from twitter_info import consumer_key, consumer_secret, access_token, access_tok
 ## **** If you choose not to do that, we strongly advise using authentication information for an 'extra' Twitter account you make just for this class, and not your personal account, because it's not ideal to share your authentication information for a real account that you use frequently.
 
 ## Get your secret values to authenticate to Twitter. You may replace each of these with variables rather than filling in the empty strings if you choose to do the secure way for 50 EC points
-
+consumer_key = cfyS4oCgKnRgCLNsGU9sqa9uH
+consumer_secret = ChU6hMKYAwrSXixwIZIPOuVP2plP9ho3Uc5UtVpP3wmWbe1Xm4
+access_token = 	2889285070-qlrhNJ1TiLQogFGYtE3s8XFPRqSe3BjbuLILvun
+access_token_secret = wuzVeDbBCPiYQz3DgaPjXqiCV8op9Xl3cCCr5dzbkfx69
 ## Set up your authentication to Twitter
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
@@ -44,27 +46,47 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser()) # Set up library to g
 
 public_tweets = api.home_timeline()
 ## Write the rest of your code here!
+
 #### Recommended order of tasks: ####
 ## 1. Set up the caching pattern start -- the dictionary and the try/except statement shown in class.
+CACHE_FNAME = "cached_data_socialmedia.json"
+try:
+	cache_file = open(CACHE_FNAME,'r')
+	cache_contents = cache_file.read()
+	CACHE_DICTION = json.loads(cache_contents)
+except:
+	CACHE_DICTION = {}
+
 ## 2. Write a function to get twitter data that works with the caching pattern, so it either gets new data or caches data, depending upon what the input to search for is. You can model this off the class exercise from Tuesday.
-## 3. Invoke your function, save the return value in a variable, and explore the data you got back!
-## 4. With what you learn from the data -- e.g. how exactly to find the text of each tweet in the big nested structure -- write code to print out content from 3 tweets, as shown above.
-
-def get_tweets():
-	phrase =input('User enter phrase ')
-	try:
-		file1= open('{}.txt'.format(phrase), 'r')
+def get_tweets_from_user(phrase):
+	phrase = input("Enter a phrase")
+	unique_identifier = "twitter_{}".format(phrase) # seestring formatting chapter
+	# see if that username+twitter is in the cache diction!
+	if unique_identifier in CACHE_DICTION: # if it is...
 		print('using cached data for', phrase)
-		return json.loads(file1.read())
-	except:
-		public_tweets = api.search(q=phrase)
-		file2= open('{}.txt'.format(phrase), 'w')
-		file2.write(json.dumps(public_tweets))
+		twitter_results = CACHE_DICTION[unique_identifier] # grab the data from the cache!
+	else:
 		print('getting data from internet for', phrase)
-		return public_tweets
+		twitter_results = api.home_timeline(phrase) # get it from the internet
+		# but also, save in the dictionary to cache it!
+		CACHE_DICTION[unique_identifier] = twitter_results # add it to the dictionary -- new key-val pair
+		# and then write the whole cache dictionary, now with new info added, to the file, so it'll be there even after your program closes!
+		f = open(CACHE_FNAME,'w') # open the cache file for writing
+		f.write(json.dumps(CACHE_DICTION)) # make the whole dictionary holding data and unique identifiers into a json-formatted string, and write that wholllle string to a file so you'll have it next time!
+		f.close()
 
-x= get_tweets()
-for each_tweet in x["statuses"][:3]:
-	print("CREATED AT:", each_tweet["created_at"])
-	print("TEXT:", each_tweet["text"])
-	print ()
+## 3. Invoke your function, save the return value in a variable, and explore the data you got back!
+x = get_tweets_from_user("I'm an awesome Python programmer.")
+y = get_tweets_from_user("Go Blue!")
+z = get_tweets_from_user("Hello!")
+## 4. With what you learn from the data -- e.g. how exactly to find the text of each tweet in the big nested structure -- write code to print out content from 3 tweets, as shown above.
+#url = 
+#self.tweet = json.loads(requests.get(url).text)
+print 
+
+
+
+
+
+
+
