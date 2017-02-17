@@ -54,13 +54,13 @@ def get_tweets():
 	phrase =input('User enter phrase ')
 	try:
 		file1= open('{}.txt'.format(phrase), 'r')
-		#print('using cached data for', phrase)
+		print('using cached data for', phrase)
 		return json.loads(file1.read())
 	except:
 		public_tweets = api.search(q=phrase)
 		file2= open('{}.txt'.format(phrase), 'w')
 		file2.write(json.dumps(public_tweets))
-		#print('getting data from internet for', phrase)
+		print('getting data from internet for', phrase)
 		return public_tweets
 
 x= get_tweets()
